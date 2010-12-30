@@ -1,0 +1,11 @@
+application: weiborss
+version: 3
+runtime: python
+api_version: 1
+
+handlers:
+- url: /.*
+  script: index.py
+
+#- url: /.*
+#  script: not_found.py
