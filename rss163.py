@@ -57,7 +57,7 @@ class Rss163(webapp.RequestHandler):
 """ % (user, user, user, strftime("%a, %d %b %Y %H:%M:%S GMT", gmtime()))
         self.response.out.write(header)
 
-        MAX_REQ = 3
+        MAX_REQ = 1
         i = 0
         last_timeline = None
         while i < MAX_REQ:
