@@ -1,4 +1,5 @@
 #  encoding: utf-8
+import re
 from time import gmtime, strftime, time
 from django.utils import simplejson as json
 from google.appengine.api.urlfetch import fetch
@@ -20,6 +21,15 @@ def fetch_tweets(user, since_timeline=None):
     return res.content
 
 
+def transform_text(text):
+    img = re.compile('http://126\.fm/\w*')
+    def sub(mo):
+        src = mo.group(0)
+        return '<img src="%s"/>' % src
+    newtext = img.sub(sub, text)
+    return newtext
+
+
 def genrss_item(user, tweet):
     text = tweet['text']
     link = "http://t.163.com/" + user + '/status/' + tweet['id'];
@@ -31,18 +41,18 @@ def genrss_item(user, tweet):
     if tweet['rootReplyUserName']:
         text = text + " ||@%s :%s" % (tweet['rootReplyUserName'], tweet['rootReplyText'])
     return u"""       <item>
-          <title>%s</title>
-          <description>%s</description>
+          <title><![CDATA[%s]]></title>
+          <description><![CDATA[%s]]></description>
           <link>%s</link>
           <pubDate>%s</pubDate>
           <guid isPermaLink=\"true\">%s</guid>
        </item>
-""" % (text, text, link, pubDate, link)
+""" % (text, transform_text(text), link, pubDate, link)
 
 
 class Rss163(webapp.RequestHandler):
     def get(self):
-        self.response.headers['Content-Type'] = 'text/plain; charset=utf-8'
+        self.response.headers['Content-Type'] = 'text/xml; charset=utf-8'
 
         user = self.request.path[5:]
 
@@ -71,9 +81,7 @@ class Rss163(webapp.RequestHandler):
             else:
                 break
 
-        footer = u"""
-  </channel>
-</rss>
+        footer = u"""  </channel>\n</rss>
 """
         self.response.out.write(footer)
 
