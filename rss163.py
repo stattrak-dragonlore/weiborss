@@ -12,7 +12,7 @@ def fetch_tweets(user, since_timeline=None):
     if since_timeline:
         since_id = since_timeline['id']
         time_since = since_timeline['time']
-    url = "http://t.163.com/statuses/user_timeline/%s.json?since_id=%s&timeSince=%s&enableEmotions=1" % (user, since_id, time_since)
+    url = "http://t.163.com/statuses/user_timeline/%s.json?since_id=%s&timeSince=%s&count=200" % (user, since_id, time_since)
     res = fetch(url)
     if res.status_code != 200:
         return False
@@ -26,6 +26,15 @@ def transform_text(text):
     def sub(mo):
         src = mo.group(0)
         return '<img src="%s"/>' % src
+    newtext = img.sub(sub, text)
+    return newtext
+
+
+def filter_imgtag(text):
+    img = re.compile('<img src=.*?alt="(.*?)".*?/>')
+    def sub(mo):
+        alt = mo.group(1)
+        return "[%s]" % alt
     newtext = img.sub(sub, text)
     return newtext
 
@@ -47,7 +56,7 @@ def genrss_item(user, tweet):
           <pubDate>%s</pubDate>
           <guid isPermaLink=\"true\">%s</guid>
        </item>
-""" % (text, transform_text(text), link, pubDate, link)
+""" % (filter_imgtag(text), transform_text(text), link, pubDate, link)
 
 
 class Rss163(webapp.RequestHandler):

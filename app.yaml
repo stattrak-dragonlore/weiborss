@@ -6,6 +6,3 @@ api_version: 1
 handlers:
 - url: /.*
   script: index.py
-
-#- url: /.*
-#  script: not_found.py
