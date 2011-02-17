@@ -46,7 +46,8 @@ def genrss_item(user, tweet):
     if tweet['user']['screen_name'] != user:
         text = ("RT: @%s: " % tweet['user']['name']) + text
     else:
-        text = "%s: " % tweet['user']['name'] + text
+        if tweet['timeline']['time'] <= 1297849060080:
+            text = "%s: " % tweet['user']['name'] + text
     if tweet['rootReplyUserName']:
         text = text + " ||@%s :%s" % (tweet['rootReplyUserName'], tweet['rootReplyText'])
     return u"""       <item>
